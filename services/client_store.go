@@ -214,7 +214,7 @@ func UpdateClientInfo(info models.ClientInfo) error {
 // notification status will be checked before sending the notification. If the user has disabled
 // notifications, the function will return an error.
 func SendNotificationToUser(payload data.EventNotification) error {
-	return sendToUser(payload.UserID, payload, false)
+	return sendToUser(payload.Data.UserID, payload, false)
 }
 
 // SendConfigurationToUser sends the user configuration to the user identified by the UserID field

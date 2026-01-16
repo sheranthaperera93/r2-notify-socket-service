@@ -381,19 +381,19 @@ func markAppReadAction(message []byte, notificationService notificationService.N
 	logger.Log.Debug(logger.LogPayload{
 		Component:     "WebSocket Mark App As Read Event",
 		Operation:     "MarkAppAsRead",
-		Message:       "Marking all notifications for app as read for client: " + clientID + ", App ID: " + event.AppId,
+		Message:       "Marking all notifications for app as read for client: " + clientID + ", App ID: " + event.Data.AppId,
 		UserId:        clientID,
 		CorrelationId: correlationId,
 	})
-	err := notificationService.MarkAppAsRead(clientID, event.AppId)
+	err := notificationService.MarkAppAsRead(clientID, event.Data.AppId)
 	if err != nil {
 		logger.Log.Error(logger.LogPayload{
 			Component:     "WebSocket Mark App As Read Event",
 			Operation:     "MarkAppAsRead",
-			Message:       "Failed to mark app as read for client " + clientID + ", App ID: " + event.AppId,
+			Message:       "Failed to mark app as read for client " + clientID + ", App ID: " + event.Data.AppId,
 			UserId:        clientID,
 			CorrelationId: correlationId,
-			AppId:         event.AppId,
+			AppId:         event.Data.AppId,
 			Error:         err,
 		})
 	}
@@ -412,7 +412,7 @@ func markGroupAsReadAction(message []byte, notificationService notificationServi
 			Operation:     "ParseEvent",
 			Message:       "Invalid event format",
 			UserId:        clientID,
-			AppId:         event.AppId,
+			AppId:         event.Data.AppId,
 			CorrelationId: correlationId,
 			Error:         err,
 		})
@@ -421,19 +421,19 @@ func markGroupAsReadAction(message []byte, notificationService notificationServi
 	logger.Log.Debug(logger.LogPayload{
 		Component:     "WebSocket Mark Group As Read Event",
 		Operation:     "MarkGroupAsRead",
-		Message:       "Marking group as read for client: " + clientID + ", App ID: " + event.AppId + ", Group Key: " + event.GroupKey,
+		Message:       "Marking group as read for client: " + clientID + ", App ID: " + event.Data.AppId + ", Group Key: " + event.Data.GroupKey,
 		UserId:        clientID,
-		AppId:         event.AppId,
+		AppId:         event.Data.AppId,
 		CorrelationId: correlationId,
 	})
-	err := notificationService.MarkGroupAsRead(clientID, event.AppId, event.GroupKey)
+	err := notificationService.MarkGroupAsRead(clientID, event.Data.AppId, event.Data.GroupKey)
 	if err != nil {
 		logger.Log.Error(logger.LogPayload{
 			Component:     "WebSocket Mark Group As Read Event",
 			Operation:     "MarkGroupAsRead",
-			Message:       "Failed to mark group as read for client " + clientID + ", App ID: " + event.AppId + ", Group Key: " + event.GroupKey,
+			Message:       "Failed to mark group as read for client " + clientID + ", App ID: " + event.Data.AppId + ", Group Key: " + event.Data.GroupKey,
 			UserId:        clientID,
-			AppId:         event.AppId,
+			AppId:         event.Data.AppId,
 			CorrelationId: correlationId,
 			Error:         err,
 		})
@@ -461,16 +461,16 @@ func markNotificationAsReadAction(message []byte, notificationService notificati
 	logger.Log.Debug(logger.LogPayload{
 		Component:     "WebSocket Mark Notification As Read Event",
 		Operation:     "MarkNotificationAsRead",
-		Message:       "Marking notification as read for client: " + clientID + ", Notification ID: " + event.Id,
+		Message:       "Marking notification as read for client: " + clientID + ", Notification ID: " + event.Data.Id,
 		UserId:        clientID,
 		CorrelationId: correlationId,
 	})
-	err := notificationService.MarkNotificationAsRead(clientID, event.Id)
+	err := notificationService.MarkNotificationAsRead(clientID, event.Data.Id)
 	if err != nil {
 		logger.Log.Error(logger.LogPayload{
 			Component:     "WebSocket Mark Notification As Read Event",
 			Operation:     "MarkNotificationAsRead",
-			Message:       "Failed to mark notification as read for client " + clientID + ", Notification ID: " + event.Id,
+			Message:       "Failed to mark notification as read for client " + clientID + ", Notification ID: " + event.Data.Id,
 			UserId:        clientID,
 			CorrelationId: correlationId,
 			Error:         err,
@@ -517,7 +517,7 @@ func deleteAppNotificationsAction(message []byte, notificationService notificati
 			Operation:     "ParseEvent",
 			Message:       "Invalid event format",
 			UserId:        clientID,
-			AppId:         event.AppId,
+			AppId:         event.Data.AppId,
 			CorrelationId: correlationId,
 			Error:         err,
 		})
@@ -526,19 +526,19 @@ func deleteAppNotificationsAction(message []byte, notificationService notificati
 	logger.Log.Debug(logger.LogPayload{
 		Component:     "WebSocket Delete App Notifications Event",
 		Operation:     "DeleteAppNotifications",
-		Message:       "Deleting all notifications for app for client: " + clientID + ", App ID: " + event.AppId,
+		Message:       "Deleting all notifications for app for client: " + clientID + ", App ID: " + event.Data.AppId,
 		UserId:        clientID,
-		AppId:         event.AppId,
+		AppId:         event.Data.AppId,
 		CorrelationId: correlationId,
 	})
-	err := notificationService.DeleteAppNotifications(clientID, event.AppId)
+	err := notificationService.DeleteAppNotifications(clientID, event.Data.AppId)
 	if err != nil {
 		logger.Log.Error(logger.LogPayload{
 			Component:     "WebSocket Delete App Notifications Event",
 			Operation:     "DeleteAppNotifications",
-			Message:       "Failed to delete app notifications for client " + clientID + ", App ID: " + event.AppId,
+			Message:       "Failed to delete app notifications for client " + clientID + ", App ID: " + event.Data.AppId,
 			UserId:        clientID,
-			AppId:         event.AppId,
+			AppId:         event.Data.AppId,
 			CorrelationId: correlationId,
 			Error:         err,
 		})
@@ -558,7 +558,7 @@ func deleteGroupNotificationAction(message []byte, notificationService notificat
 			Operation:     "ParseEvent",
 			Message:       "Invalid event format",
 			UserId:        clientID,
-			AppId:         event.AppId,
+			AppId:         event.Data.AppId,
 			CorrelationId: correlationId,
 			Error:         err,
 		})
@@ -567,19 +567,19 @@ func deleteGroupNotificationAction(message []byte, notificationService notificat
 	logger.Log.Debug(logger.LogPayload{
 		Component:     "WebSocket Delete Group Notifications Event",
 		Operation:     "DeleteGroupNotifications",
-		Message:       "Deleting group notifications for client: " + clientID + ", App ID: " + event.AppId + ", Group Key: " + event.GroupKey,
+		Message:       "Deleting group notifications for client: " + clientID + ", App ID: " + event.Data.AppId + ", Group Key: " + event.Data.GroupKey,
 		UserId:        clientID,
-		AppId:         event.AppId,
+		AppId:         event.Data.AppId,
 		CorrelationId: correlationId,
 	})
-	err := notificationService.DeleteGroupNotifications(clientID, event.AppId, event.GroupKey)
+	err := notificationService.DeleteGroupNotifications(clientID, event.Data.AppId, event.Data.GroupKey)
 	if err != nil {
 		logger.Log.Error(logger.LogPayload{
 			Component:     "WebSocket Delete Group Notifications Event",
 			Operation:     "DeleteGroupNotifications",
-			Message:       "Failed to delete group notifications for client " + clientID + ", App ID: " + event.AppId + ", Group Key: " + event.GroupKey,
+			Message:       "Failed to delete group notifications for client " + clientID + ", App ID: " + event.Data.AppId + ", Group Key: " + event.Data.GroupKey,
 			UserId:        clientID,
-			AppId:         event.AppId,
+			AppId:         event.Data.AppId,
 			CorrelationId: correlationId,
 			Error:         err,
 		})
@@ -607,16 +607,16 @@ func deleteNotificationAction(message []byte, notificationService notificationSe
 	logger.Log.Debug(logger.LogPayload{
 		Component:     "WebSocket Delete Notification Event",
 		Operation:     "DeleteNotification",
-		Message:       "Deleting notification for client: " + clientID + ", Notification ID: " + event.Id,
+		Message:       "Deleting notification for client: " + clientID + ", Notification ID: " + event.Data.Id,
 		UserId:        clientID,
 		CorrelationId: correlationId,
 	})
-	err := notificationService.DeleteNotification(clientID, event.Id)
+	err := notificationService.DeleteNotification(clientID, event.Data.Id)
 	if err != nil {
 		logger.Log.Error(logger.LogPayload{
 			Component:     "WebSocket Delete Notification Event",
 			Operation:     "DeleteNotification",
-			Message:       "Failed to delete notification for client " + clientID + ", Notification ID: " + event.Id,
+			Message:       "Failed to delete notification for client " + clientID + ", Notification ID: " + event.Data.Id,
 			UserId:        clientID,
 			CorrelationId: correlationId,
 			Error:         err,

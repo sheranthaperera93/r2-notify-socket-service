@@ -35,7 +35,7 @@ type Event struct {
 
 type EventNotification struct {
 	Event
-	Notification
+	Data Notification `json:"data"`
 }
 
 type NotificationList struct {

@@ -94,7 +94,7 @@ func StartEventHubConsumer(ctx context.Context, notificationService notification
 				// Send Notification to connected client web socket
 				payload := data.EventNotification{
 					Event: data.Event{Event: data.NEW_NOTIFICATION},
-					Notification: data.Notification{
+					Data: data.Notification{
 						Id:        recordId.Hex(),
 						UserID:    eventData.UserId,
 						AppId:     eventData.AppId,
