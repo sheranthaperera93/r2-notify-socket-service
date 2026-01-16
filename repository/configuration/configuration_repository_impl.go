@@ -29,8 +29,7 @@ func NewConfigurationRepositoryImpl(Db *mongo.Database) ConfigurationRepository 
 func (t ConfigurationRepositoryImpl) FindByAppAndUser(userId string) (models.Configuration, error) {
 	var configuration models.Configuration
 	logger.Log.Debug(logger.LogPayload{
-		Service:   "Repository",
-		Component: "ConfigurationRepository",
+		Component: "Configuration Repository",
 		Operation: "FindByAppAndUser",
 		Message:   "Fetching configuration for userId: " + userId,
 		UserId:    userId,
@@ -41,8 +40,7 @@ func (t ConfigurationRepositoryImpl) FindByAppAndUser(userId string) (models.Con
 	).Decode(&configuration)
 	if err != nil {
 		logger.Log.Error(logger.LogPayload{
-			Service:   "Repository",
-			Component: "ConfigurationRepository",
+			Component: "Configuration Repository",
 			Operation: "FindByAppAndUser",
 			Message:   "Failed to fetch configuration for userId: " + userId,
 			Error:     err,
@@ -51,8 +49,7 @@ func (t ConfigurationRepositoryImpl) FindByAppAndUser(userId string) (models.Con
 		return models.Configuration{}, err
 	}
 	logger.Log.Debug(logger.LogPayload{
-		Service:   "Repository",
-		Component: "ConfigurationRepository",
+		Component: "Configuration Repository",
 		Operation: "FindByAppAndUser",
 		Message:   "Successfully fetched configuration for userId: " + userId,
 		UserId:    userId,
@@ -65,8 +62,7 @@ func (t ConfigurationRepositoryImpl) FindByAppAndUser(userId string) (models.Con
 // is successful, or an error if the operation fails.
 func (t *ConfigurationRepositoryImpl) Create(configuration models.Configuration) (primitive.ObjectID, error) {
 	logger.Log.Debug(logger.LogPayload{
-		Service:   "Repository",
-		Component: "ConfigurationRepository",
+		Component: "Configuration Repository",
 		Operation: "Create",
 		Message:   "Creating configuration for userId: " + configuration.UserId,
 		UserId:    configuration.UserId,
@@ -74,8 +70,7 @@ func (t *ConfigurationRepositoryImpl) Create(configuration models.Configuration)
 	result, err := t.Db.Collection("configurations").InsertOne(context.Background(), configuration)
 	if err != nil {
 		logger.Log.Error(logger.LogPayload{
-			Service:   "Repository",
-			Component: "ConfigurationRepository",
+			Component: "Configuration Repository",
 			Operation: "Create",
 			Message:   "Failed to create configuration for userId: " + configuration.UserId,
 			Error:     err,
@@ -87,8 +82,7 @@ func (t *ConfigurationRepositoryImpl) Create(configuration models.Configuration)
 	if !ok {
 		convertErr := errors.New("failed to convert inserted ID to ObjectID")
 		logger.Log.Error(logger.LogPayload{
-			Service:   "Repository",
-			Component: "ConfigurationRepository",
+			Component: "Configuration Repository",
 			Operation: "Create",
 			Message:   "Failed to convert inserted ID for userId: " + configuration.UserId,
 			Error:     convertErr,
@@ -97,8 +91,7 @@ func (t *ConfigurationRepositoryImpl) Create(configuration models.Configuration)
 		return primitive.NilObjectID, convertErr
 	}
 	logger.Log.Info(logger.LogPayload{
-		Service:   "Repository",
-		Component: "ConfigurationRepository",
+		Component: "Configuration Repository",
 		Operation: "Create",
 		Message:   "Successfully created configuration for userId: " + configuration.UserId,
 		UserId:    configuration.UserId,
@@ -111,8 +104,7 @@ func (t *ConfigurationRepositoryImpl) Create(configuration models.Configuration)
 // operation fails, or if no document is found to update.
 func (t *ConfigurationRepositoryImpl) Update(configuration models.Configuration) error {
 	logger.Log.Debug(logger.LogPayload{
-		Service:   "Repository",
-		Component: "ConfigurationRepository",
+		Component: "Configuration Repository",
 		Operation: "Update",
 		Message:   "Updating configuration for userId: " + configuration.UserId,
 		UserId:    configuration.UserId,
@@ -126,8 +118,7 @@ func (t *ConfigurationRepositoryImpl) Update(configuration models.Configuration)
 	result, err := t.Db.Collection("configurations").UpdateOne(context.Background(), filter, update)
 	if err != nil {
 		logger.Log.Error(logger.LogPayload{
-			Service:   "Repository",
-			Component: "ConfigurationRepository",
+			Component: "Configuration Repository",
 			Operation: "Update",
 			Message:   "Failed to update configuration for userId: " + configuration.UserId,
 			Error:     err,
@@ -138,8 +129,7 @@ func (t *ConfigurationRepositoryImpl) Update(configuration models.Configuration)
 	if result.MatchedCount == 0 {
 		notFoundErr := errors.New("no document found to update")
 		logger.Log.Error(logger.LogPayload{
-			Service:   "Repository",
-			Component: "ConfigurationRepository",
+			Component: "Configuration Repository",
 			Operation: "Update",
 			Message:   "No configuration document found to update for userId: " + configuration.UserId,
 			Error:     notFoundErr,
@@ -148,8 +138,7 @@ func (t *ConfigurationRepositoryImpl) Update(configuration models.Configuration)
 		return notFoundErr
 	}
 	logger.Log.Info(logger.LogPayload{
-		Service:   "Repository",
-		Component: "ConfigurationRepository",
+		Component: "Configuration Repository",
 		Operation: "Update",
 		Message:   "Successfully updated configuration for userId: " + configuration.UserId,
 		UserId:    configuration.UserId,
@@ -162,8 +151,7 @@ func (t *ConfigurationRepositoryImpl) Update(configuration models.Configuration)
 // document is found to delete.
 func (t *ConfigurationRepositoryImpl) Delete(userId string) error {
 	logger.Log.Debug(logger.LogPayload{
-		Service:   "Repository",
-		Component: "ConfigurationRepository",
+		Component: "Configuration Repository",
 		Operation: "Delete",
 		Message:   "Deleting configuration for userId: " + userId,
 		UserId:    userId,
@@ -174,8 +162,7 @@ func (t *ConfigurationRepositoryImpl) Delete(userId string) error {
 	result, err := t.Db.Collection("configurations").DeleteOne(context.Background(), filter)
 	if err != nil {
 		logger.Log.Error(logger.LogPayload{
-			Service:   "Repository",
-			Component: "ConfigurationRepository",
+			Component: "Configuration Repository",
 			Operation: "Delete",
 			Message:   "Failed to delete configuration for userId: " + userId,
 			Error:     err,
@@ -186,8 +173,7 @@ func (t *ConfigurationRepositoryImpl) Delete(userId string) error {
 	if result.DeletedCount == 0 {
 		notFoundErr := errors.New("no document found to delete")
 		logger.Log.Error(logger.LogPayload{
-			Service:   "Repository",
-			Component: "ConfigurationRepository",
+			Component: "Configuration Repository",
 			Operation: "Delete",
 			Message:   "No configuration document found to delete for userId: " + userId,
 			Error:     notFoundErr,
@@ -196,8 +182,7 @@ func (t *ConfigurationRepositoryImpl) Delete(userId string) error {
 		return notFoundErr
 	}
 	logger.Log.Info(logger.LogPayload{
-		Service:   "Repository",
-		Component: "ConfigurationRepository",
+		Component: "Configuration Repository",
 		Operation: "Delete",
 		Message:   "Successfully deleted configuration for userId: " + userId,
 		UserId:    userId,

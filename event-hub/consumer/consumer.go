@@ -32,8 +32,7 @@ func StartEventHubConsumer(ctx context.Context, notificationService notification
 	}
 	logger.Log.Debug(logger.LogPayload{
 		Message:   "Connected to Event Hub",
-		Service:   "Azure EventHub",
-		Component: "EventHub Consumer",
+		Component: "Azure EventHub Consumer Consumer",
 		Operation: "StartEventHubConsumer",
 	})
 
@@ -51,8 +50,7 @@ func StartEventHubConsumer(ctx context.Context, notificationService notification
 
 				logger.Log.Debug(logger.LogPayload{
 					Message:       fmt.Sprintf("Received event from Event Hub %s", string(event.Data)),
-					Service:       "Azure EventHub",
-					Component:     "EventHub Consumer",
+					Component:     "Azure EventHub Consumer Consumer",
 					Operation:     "OnEventReceived",
 					CorrelationId: correlationId,
 				})
@@ -61,8 +59,7 @@ func StartEventHubConsumer(ctx context.Context, notificationService notification
 				if err := json.Unmarshal(event.Data, &eventData); err != nil {
 					logger.Log.Error(logger.LogPayload{
 						Message:       "Invalid message format",
-						Service:       "Azure EventHub",
-						Component:     "EventHub Consumer",
+						Component:     "Azure EventHub Consumer Consumer",
 						Operation:     "OnEventReceived",
 						Error:         err,
 						CorrelationId: correlationId,
@@ -86,8 +83,7 @@ func StartEventHubConsumer(ctx context.Context, notificationService notification
 				if err != nil {
 					logger.Log.Error(logger.LogPayload{
 						Message:       "Notification entry insert error",
-						Service:       "Azure EventHub",
-						Component:     "EventHub Consumer",
+						Component:     "Azure EventHub Consumer",
 						Operation:     "OnEventReceived",
 						Error:         err,
 						CorrelationId: correlationId,
@@ -114,8 +110,7 @@ func StartEventHubConsumer(ctx context.Context, notificationService notification
 
 				logger.Log.Info(logger.LogPayload{
 					Message:       fmt.Sprintf("Sending notification to user %v", m),
-					Service:       "Azure EventHub",
-					Component:     "EventHub Consumer",
+					Component:     "Azure EventHub Consumer",
 					Operation:     "OnEventReceived",
 					CorrelationId: correlationId,
 				})
@@ -128,8 +123,7 @@ func StartEventHubConsumer(ctx context.Context, notificationService notification
 	<-ctx.Done()
 	logger.Log.Info(logger.LogPayload{
 		Message:   "Shutting down event hub consumer",
-		Service:   "Azure EventHub",
-		Component: "EventHub Consumer",
+		Component: "Azure EventHub Consumer Consumer",
 		Operation: "Shutdown EventHub Consumer",
 	})
 	hub.Close(context.Background())

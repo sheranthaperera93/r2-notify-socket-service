@@ -43,8 +43,7 @@ func NewWebSocketHandler(notificationService notificationService.NotificationSer
 		if err != nil {
 			logger.Log.Error(logger.LogPayload{
 				Message:   "Upgrade error",
-				Service:   "WebSocket",
-				Component: "NewWebSocketHandler",
+				Component: "WebSocket",
 				Operation: "NewWebSocketHandler",
 				Error:     err,
 			})
@@ -55,8 +54,7 @@ func NewWebSocketHandler(notificationService notificationService.NotificationSer
 		if clientID == "" {
 			logger.Log.Error(logger.LogPayload{
 				Message:   "Missing user ID",
-				Service:   "WebSocket",
-				Component: "NewWebSocketHandler",
+				Component: "WebSocket",
 				Operation: "NewWebSocketHandler",
 				Error:     err,
 			})
@@ -68,8 +66,7 @@ func NewWebSocketHandler(notificationService notificationService.NotificationSer
 		conn.SetReadDeadline(time.Now().Add(60 * time.Second)) // initial deadline
 		conn.SetPongHandler(func(string) error {
 			logger.Log.Info(logger.LogPayload{
-				Service:   "WebSocket",
-				Component: "PongHandler",
+				Component: "WebSocket Pong Handler",
 				Operation: "SetPongHandler",
 				Message:   "Pong received from client " + clientID,
 				UserId:    clientID,
@@ -89,8 +86,7 @@ func NewWebSocketHandler(notificationService notificationService.NotificationSer
 				if err := conn.WriteMessage(websocket.PingMessage, nil); err != nil {
 					log.Printf("Ping failed for client %s: %v\n", clientID, err.Error())
 					logger.Log.Error(logger.LogPayload{
-						Service:   "WebSocket",
-						Component: "PongHandler",
+						Component: "WebSocket Pong Handler",
 						Operation: "PingHandler",
 						Message:   "Ping failed for client " + clientID,
 						UserId:    clientID,
@@ -100,8 +96,7 @@ func NewWebSocketHandler(notificationService notificationService.NotificationSer
 					return
 				}
 				logger.Log.Info(logger.LogPayload{
-					Service:   "WebSocket",
-					Component: "PingHandler",
+					Component: "WebSocket Ping Handler",
 					Operation: "SetPongHandler",
 					Message:   "Ping sent to client " + clientID,
 					UserId:    clientID,
@@ -116,8 +111,7 @@ func NewWebSocketHandler(notificationService notificationService.NotificationSer
 		// Handle Enable Notification Configuration
 		isEnableNotification := true
 		logger.Log.Info(logger.LogPayload{
-			Service:       "WebSocket",
-			Component:     "Configuration Handler",
+			Component:     "WebSocket Configuration Handler",
 			Operation:     "User Configuration Fetch",
 			Message:       "Fetching configuration for client " + clientID,
 			UserId:        clientID,
@@ -130,8 +124,7 @@ func NewWebSocketHandler(notificationService notificationService.NotificationSer
 				EnableNotifications: isEnableNotification,
 			})
 			logger.Log.Info(logger.LogPayload{
-				Service:       "WebSocket",
-				Component:     "Configuration Handler",
+				Component:     "WebSocket Configuration Handler",
 				Operation:     "User Configuration Create",
 				Message:       "Creating configuration for client " + clientID,
 				UserId:        clientID,
@@ -139,8 +132,7 @@ func NewWebSocketHandler(notificationService notificationService.NotificationSer
 			})
 			if err != nil {
 				logger.Log.Error(logger.LogPayload{
-					Service:       "WebSocket",
-					Component:     "Configuration Handler",
+					Component:     "WebSocket Configuration Handler",
 					Operation:     "User Configuration Create",
 					Message:       "Failed to create configuration for client " + clientID,
 					Error:         err,
@@ -162,8 +154,7 @@ func NewWebSocketHandler(notificationService notificationService.NotificationSer
 
 		if err := clientStore.StoreClient(info, conn); err != nil {
 			logger.Log.Error(logger.LogPayload{
-				Service:       "WebSocket",
-				Component:     "Redis Store",
+				Component:     "WebSocket Redis Store",
 				Operation:     "Redis Store Client",
 				Message:       "Failed to store client in Redis for client " + clientID,
 				UserId:        clientID,
@@ -175,9 +166,8 @@ func NewWebSocketHandler(notificationService notificationService.NotificationSer
 		}
 
 		logger.Log.Error(logger.LogPayload{
-			Service:       "WebSocket",
-			Component:     "Websocket Store",
-			Operation:     "Websocket Store Client",
+			Component:     "WebSocket Websocket Store",
+			Operation:     "WebSocket Store Client",
 			Message:       fmt.Sprintf("Client %s connected", clientID),
 			UserId:        clientID,
 			CorrelationId: correlationId,
@@ -196,9 +186,8 @@ func NewWebSocketHandler(notificationService notificationService.NotificationSer
 				_, message, err := conn.ReadMessage()
 				if err != nil {
 					logger.Log.Info(logger.LogPayload{
-						Service:       "WebSocket",
-						Component:     "Websocket Store",
-						Operation:     "Websocket Store Client",
+						Component:     "WebSocket Websocket Store",
+						Operation:     "WebSocket Store Client",
 						Message:       fmt.Sprintf("Client %s disconnected", clientID),
 						UserId:        clientID,
 						CorrelationId: correlationId,
@@ -211,8 +200,7 @@ func NewWebSocketHandler(notificationService notificationService.NotificationSer
 				var action data.Action
 				if err := json.Unmarshal(message, &action); err != nil {
 					logger.Log.Error(logger.LogPayload{
-						Service:       "WebSocket",
-						Component:     "Websocket Event Handler",
+						Component:     "WebSocket Event Handler",
 						Operation:     "ParseAction",
 						Message:       "Invalid event format",
 						Error:         err,
@@ -223,8 +211,7 @@ func NewWebSocketHandler(notificationService notificationService.NotificationSer
 				}
 
 				logger.Log.Debug(logger.LogPayload{
-					Service:       "WebSocket",
-					Component:     "Websocket Event Handler",
+					Component:     "WebSocket Event Handler",
 					Operation:     "HandleAction",
 					Message:       "Processing action: " + action.Action,
 					UserId:        clientID,
@@ -260,8 +247,7 @@ func NewWebSocketHandler(notificationService notificationService.NotificationSer
 					toggleNotificationStatusAction(message, configurationService, notificationService, clientID, correlationId)
 				default:
 					logger.Log.Warn(logger.LogPayload{
-						Service:       "WebSocket",
-						Component:     "Websocket Event Handler",
+						Component:     "WebSocket Event Handler",
 						Operation:     "HandleAction",
 						Message:       "Unknown event type: " + action.Action,
 						UserId:        clientID,
@@ -286,23 +272,20 @@ func sendAllNotificationsToClient(notificationService notificationService.Notifi
 	}
 	if err != nil {
 		logger.Log.Error(logger.LogPayload{
-			Service:   "WebSocket",
-			Component: "Notification Handler",
+			Component: "WebSocket Notification Handler",
 			Operation: "FetchNotifications",
 			Message:   "Failed to fetch notifications for client " + clientId,
 			Error:     err,
 		})
 	} else {
 		logger.Log.Debug(logger.LogPayload{
-			Service:   "WebSocket",
-			Component: "Notification Handler",
+			Component: "WebSocket Notification Handler",
 			Operation: "SendNotifications",
 			Message:   "Sending all notifications to client: " + clientId,
 		})
 		if err := clientStore.SendNotificationListToUser(clientId, payload); err != nil {
 			logger.Log.Error(logger.LogPayload{
-				Service:   "WebSocket",
-				Component: "Notification Handler",
+				Component: "WebSocket Notification Handler",
 				Operation: "SendNotifications",
 				Message:   "Failed to send notifications to client " + clientId,
 				Error:     err,
@@ -325,8 +308,7 @@ func sendConfigurationsToClient(configurationService configurationService.Config
 	}
 	if err != nil {
 		logger.Log.Error(logger.LogPayload{
-			Service:       "WebSocket",
-			Component:     "Configuration Handler",
+			Component:     "WebSocket Configuration Handler",
 			Operation:     "FetchConfigurations",
 			Message:       "Failed to fetch configurations for client " + clientId,
 			UserId:        clientId,
@@ -335,8 +317,7 @@ func sendConfigurationsToClient(configurationService configurationService.Config
 		})
 	} else {
 		logger.Log.Debug(logger.LogPayload{
-			Service:       "WebSocket",
-			Component:     "Configuration Handler",
+			Component:     "WebSocket Configuration Handler",
 			Operation:     "SendConfigurations",
 			Message:       "Sending configurations to client: " + clientId,
 			UserId:        clientId,
@@ -344,8 +325,7 @@ func sendConfigurationsToClient(configurationService configurationService.Config
 		})
 		if err := clientStore.SendConfigurationToUser(payload, true); err != nil {
 			logger.Log.Error(logger.LogPayload{
-				Service:       "WebSocket",
-				Component:     "Configuration Handler",
+				Component:     "WebSocket Configuration Handler",
 				Operation:     "SendConfigurations",
 				Message:       "Failed to send configurations to client " + clientId,
 				UserId:        clientId,
@@ -361,8 +341,7 @@ func sendConfigurationsToClient(configurationService configurationService.Config
 // Logs errors if the update operation fails.
 func markAsReadAction(notificationService notificationService.NotificationService, clientID string, correlationId string) {
 	logger.Log.Debug(logger.LogPayload{
-		Service:       "WebSocket",
-		Component:     "Mark As Read Action",
+		Component:     "WebSocket Mark As Read Action",
 		Operation:     "MarkAllAsRead",
 		Message:       "Marking all notifications as read for client: " + clientID,
 		UserId:        clientID,
@@ -371,8 +350,7 @@ func markAsReadAction(notificationService notificationService.NotificationServic
 	err := notificationService.MarkAsRead(clientID)
 	if err != nil {
 		logger.Log.Error(logger.LogPayload{
-			Service:       "WebSocket",
-			Component:     "Mark As Read Action",
+			Component:     "WebSocket Mark As Read Action",
 			Operation:     "MarkAllAsRead",
 			Message:       "Failed to mark all notifications as read for client " + clientID,
 			UserId:        clientID,
@@ -391,8 +369,7 @@ func markAppReadAction(message []byte, notificationService notificationService.N
 	var event data.ActionNotification
 	if err := json.Unmarshal(message, &event); err != nil {
 		logger.Log.Error(logger.LogPayload{
-			Service:       "WebSocket",
-			Component:     "Mark App As Read Action",
+			Component:     "WebSocket Mark App As Read Action",
 			Operation:     "ParseEvent",
 			Message:       "Invalid event format",
 			UserId:        clientID,
@@ -402,8 +379,7 @@ func markAppReadAction(message []byte, notificationService notificationService.N
 		return
 	}
 	logger.Log.Debug(logger.LogPayload{
-		Service:       "WebSocket",
-		Component:     "Mark App As Read Action",
+		Component:     "WebSocket Mark App As Read Action",
 		Operation:     "MarkAppAsRead",
 		Message:       "Marking all notifications for app as read for client: " + clientID + ", App ID: " + event.AppId,
 		UserId:        clientID,
@@ -412,8 +388,7 @@ func markAppReadAction(message []byte, notificationService notificationService.N
 	err := notificationService.MarkAppAsRead(clientID, event.AppId)
 	if err != nil {
 		logger.Log.Error(logger.LogPayload{
-			Service:       "WebSocket",
-			Component:     "Mark App As Read Action",
+			Component:     "WebSocket Mark App As Read Action",
 			Operation:     "MarkAppAsRead",
 			Message:       "Failed to mark app as read for client " + clientID + ", App ID: " + event.AppId,
 			UserId:        clientID,
@@ -433,8 +408,7 @@ func markGroupAsReadAction(message []byte, notificationService notificationServi
 	var event data.ActionNotification
 	if err := json.Unmarshal(message, &event); err != nil {
 		logger.Log.Error(logger.LogPayload{
-			Service:       "WebSocket",
-			Component:     "Mark Group As Read Action",
+			Component:     "WebSocket Mark Group As Read Action",
 			Operation:     "ParseEvent",
 			Message:       "Invalid event format",
 			UserId:        clientID,
@@ -445,8 +419,7 @@ func markGroupAsReadAction(message []byte, notificationService notificationServi
 		return
 	}
 	logger.Log.Debug(logger.LogPayload{
-		Service:       "WebSocket",
-		Component:     "Mark Group As Read Action",
+		Component:     "WebSocket Mark Group As Read Action",
 		Operation:     "MarkGroupAsRead",
 		Message:       "Marking group as read for client: " + clientID + ", App ID: " + event.AppId + ", Group Key: " + event.GroupKey,
 		UserId:        clientID,
@@ -456,8 +429,7 @@ func markGroupAsReadAction(message []byte, notificationService notificationServi
 	err := notificationService.MarkGroupAsRead(clientID, event.AppId, event.GroupKey)
 	if err != nil {
 		logger.Log.Error(logger.LogPayload{
-			Service:       "WebSocket",
-			Component:     "Mark Group As Read Action",
+			Component:     "WebSocket Mark Group As Read Action",
 			Operation:     "MarkGroupAsRead",
 			Message:       "Failed to mark group as read for client " + clientID + ", App ID: " + event.AppId + ", Group Key: " + event.GroupKey,
 			UserId:        clientID,
@@ -477,8 +449,7 @@ func markNotificationAsReadAction(message []byte, notificationService notificati
 	var event data.ActionNotification
 	if err := json.Unmarshal(message, &event); err != nil {
 		logger.Log.Error(logger.LogPayload{
-			Service:       "WebSocket",
-			Component:     "Mark Notification As Read Action",
+			Component:     "WebSocket Mark Notification As Read Action",
 			Operation:     "ParseEvent",
 			Message:       "Invalid event format",
 			UserId:        clientID,
@@ -488,8 +459,7 @@ func markNotificationAsReadAction(message []byte, notificationService notificati
 		return
 	}
 	logger.Log.Debug(logger.LogPayload{
-		Service:       "WebSocket",
-		Component:     "Mark Notification As Read Action",
+		Component:     "WebSocket Mark Notification As Read Action",
 		Operation:     "MarkNotificationAsRead",
 		Message:       "Marking notification as read for client: " + clientID + ", Notification ID: " + event.Id,
 		UserId:        clientID,
@@ -498,8 +468,7 @@ func markNotificationAsReadAction(message []byte, notificationService notificati
 	err := notificationService.MarkNotificationAsRead(clientID, event.Id)
 	if err != nil {
 		logger.Log.Error(logger.LogPayload{
-			Service:       "WebSocket",
-			Component:     "Mark Notification As Read Action",
+			Component:     "WebSocket Mark Notification As Read Action",
 			Operation:     "MarkNotificationAsRead",
 			Message:       "Failed to mark notification as read for client " + clientID + ", Notification ID: " + event.Id,
 			UserId:        clientID,
@@ -516,8 +485,7 @@ func markNotificationAsReadAction(message []byte, notificationService notificati
 // Logs errors if the message format is invalid or if the update operation fails.
 func deleteNotificationsAction(notificationService notificationService.NotificationService, clientID string, correlationId string) {
 	logger.Log.Debug(logger.LogPayload{
-		Service:       "WebSocket",
-		Component:     "Delete Notifications Action",
+		Component:     "WebSocket Delete Notifications Action",
 		Operation:     "DeleteAllNotifications",
 		Message:       "Deleting notifications for client: " + clientID,
 		UserId:        clientID,
@@ -526,8 +494,7 @@ func deleteNotificationsAction(notificationService notificationService.Notificat
 	err := notificationService.DeleteNotifications(clientID)
 	if err != nil {
 		logger.Log.Error(logger.LogPayload{
-			Service:       "WebSocket",
-			Component:     "Delete Notifications Action",
+			Component:     "WebSocket Delete Notifications Action",
 			Operation:     "DeleteAllNotifications",
 			Message:       "Failed to delete all notifications for client " + clientID,
 			UserId:        clientID,
@@ -546,8 +513,7 @@ func deleteAppNotificationsAction(message []byte, notificationService notificati
 	var event data.ActionNotification
 	if err := json.Unmarshal(message, &event); err != nil {
 		logger.Log.Error(logger.LogPayload{
-			Service:       "WebSocket",
-			Component:     "Delete App Notifications Action",
+			Component:     "WebSocket Delete App Notifications Action",
 			Operation:     "ParseEvent",
 			Message:       "Invalid event format",
 			UserId:        clientID,
@@ -558,8 +524,7 @@ func deleteAppNotificationsAction(message []byte, notificationService notificati
 		return
 	}
 	logger.Log.Debug(logger.LogPayload{
-		Service:       "WebSocket",
-		Component:     "Delete App Notifications Action",
+		Component:     "WebSocket Delete App Notifications Action",
 		Operation:     "DeleteAppNotifications",
 		Message:       "Deleting all notifications for app for client: " + clientID + ", App ID: " + event.AppId,
 		UserId:        clientID,
@@ -569,8 +534,7 @@ func deleteAppNotificationsAction(message []byte, notificationService notificati
 	err := notificationService.DeleteAppNotifications(clientID, event.AppId)
 	if err != nil {
 		logger.Log.Error(logger.LogPayload{
-			Service:       "WebSocket",
-			Component:     "Delete App Notifications Action",
+			Component:     "WebSocket Delete App Notifications Action",
 			Operation:     "DeleteAppNotifications",
 			Message:       "Failed to delete app notifications for client " + clientID + ", App ID: " + event.AppId,
 			UserId:        clientID,
@@ -590,8 +554,7 @@ func deleteGroupNotificationAction(message []byte, notificationService notificat
 	var event data.ActionNotification
 	if err := json.Unmarshal(message, &event); err != nil {
 		logger.Log.Error(logger.LogPayload{
-			Service:       "WebSocket",
-			Component:     "Delete Group Notifications Action",
+			Component:     "WebSocket Delete Group Notifications Action",
 			Operation:     "ParseEvent",
 			Message:       "Invalid event format",
 			UserId:        clientID,
@@ -602,8 +565,7 @@ func deleteGroupNotificationAction(message []byte, notificationService notificat
 		return
 	}
 	logger.Log.Debug(logger.LogPayload{
-		Service:       "WebSocket",
-		Component:     "Delete Group Notifications Action",
+		Component:     "WebSocket Delete Group Notifications Action",
 		Operation:     "DeleteGroupNotifications",
 		Message:       "Deleting group notifications for client: " + clientID + ", App ID: " + event.AppId + ", Group Key: " + event.GroupKey,
 		UserId:        clientID,
@@ -613,8 +575,7 @@ func deleteGroupNotificationAction(message []byte, notificationService notificat
 	err := notificationService.DeleteGroupNotifications(clientID, event.AppId, event.GroupKey)
 	if err != nil {
 		logger.Log.Error(logger.LogPayload{
-			Service:       "WebSocket",
-			Component:     "Delete Group Notifications Action",
+			Component:     "WebSocket Delete Group Notifications Action",
 			Operation:     "DeleteGroupNotifications",
 			Message:       "Failed to delete group notifications for client " + clientID + ", App ID: " + event.AppId + ", Group Key: " + event.GroupKey,
 			UserId:        clientID,
@@ -634,8 +595,7 @@ func deleteNotificationAction(message []byte, notificationService notificationSe
 	var event data.ActionNotification
 	if err := json.Unmarshal(message, &event); err != nil {
 		logger.Log.Error(logger.LogPayload{
-			Service:       "WebSocket",
-			Component:     "Delete Notification Action",
+			Component:     "WebSocket Delete Notification Action",
 			Operation:     "ParseEvent",
 			Message:       "Invalid event format",
 			UserId:        clientID,
@@ -645,8 +605,7 @@ func deleteNotificationAction(message []byte, notificationService notificationSe
 		return
 	}
 	logger.Log.Debug(logger.LogPayload{
-		Service:       "WebSocket",
-		Component:     "Delete Notification Action",
+		Component:     "WebSocket Delete Notification Action",
 		Operation:     "DeleteNotification",
 		Message:       "Deleting notification for client: " + clientID + ", Notification ID: " + event.Id,
 		UserId:        clientID,
@@ -655,8 +614,7 @@ func deleteNotificationAction(message []byte, notificationService notificationSe
 	err := notificationService.DeleteNotification(clientID, event.Id)
 	if err != nil {
 		logger.Log.Error(logger.LogPayload{
-			Service:       "WebSocket",
-			Component:     "Delete Notification Action",
+			Component:     "WebSocket Delete Notification Action",
 			Operation:     "DeleteNotification",
 			Message:       "Failed to delete notification for client " + clientID + ", Notification ID: " + event.Id,
 			UserId:        clientID,
@@ -676,8 +634,7 @@ func toggleNotificationStatusAction(message []byte, configurationService configu
 	var event data.Configuration
 	if err := json.Unmarshal(message, &event); err != nil {
 		logger.Log.Error(logger.LogPayload{
-			Service:       "WebSocket",
-			Component:     "Toggle Notification Status Action",
+			Component:     "WebSocket Toggle Notification Status Action",
 			Operation:     "ParseEvent",
 			Message:       "Invalid event format",
 			UserId:        clientID,
@@ -692,8 +649,7 @@ func toggleNotificationStatusAction(message []byte, configurationService configu
 	})
 	if err != nil {
 		logger.Log.Error(logger.LogPayload{
-			Service:       "WebSocket",
-			Component:     "Toggle Notification Status Action",
+			Component:     "WebSocket Toggle Notification Status Action",
 			Operation:     "UpdateConfiguration",
 			Message:       "Failed to update configuration for client " + clientID,
 			UserId:        clientID,
@@ -702,8 +658,7 @@ func toggleNotificationStatusAction(message []byte, configurationService configu
 		})
 	}
 	logger.Log.Info(logger.LogPayload{
-		Service:       "WebSocket",
-		Component:     "Toggle Notification Status Action",
+		Component:     "WebSocket Toggle Notification Status Action",
 		Operation:     "UpdateConfiguration",
 		Message:       "Updated configuration for client: " + clientID + ", EnableNotification: " + fmt.Sprintf("%v", event.EnableNotification),
 		UserId:        clientID,
@@ -715,8 +670,7 @@ func toggleNotificationStatusAction(message []byte, configurationService configu
 	})
 	if event.EnableNotification {
 		logger.Log.Debug(logger.LogPayload{
-			Service:       "WebSocket",
-			Component:     "Toggle Notification Status Action",
+			Component:     "WebSocket Toggle Notification Status Action",
 			Operation:     "SendNotifications",
 			Message:       "Sending all notifications to client: " + clientID,
 			UserId:        clientID,

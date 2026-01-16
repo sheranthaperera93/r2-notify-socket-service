@@ -12,8 +12,7 @@ func CorrelationIDMiddleware() gin.HandlerFunc {
 		// Try to get correlation ID from header
 		correlationID := c.Request.Header.Get("X-Correlation-ID")
 		logger.Log.Info(logger.LogPayload{
-			Service:       "CorrelationMiddleware",
-			Component:     "Middleware",
+			Component:     "Correlation Middleware",
 			Operation:     "CorrelationIDMiddleware",
 			Message:       "Extracting X-Correlation-ID from request header",
 			UserId:        c.Request.Header.Get("X-User-ID"),
@@ -23,8 +22,7 @@ func CorrelationIDMiddleware() gin.HandlerFunc {
 		if correlationID == "" {
 			correlationID = utils.GenerateUUID()
 			logger.Log.Info(logger.LogPayload{
-				Service:       "CorrelationMiddleware",
-				Component:     "Middleware",
+				Component:     "Correlation Middleware",
 				Operation:     "CorrelationIDMiddleware",
 				Message:       "X-Correlation-ID is missing, generated new correlation ID",
 				UserId:        c.Request.Header.Get("X-User-ID"),

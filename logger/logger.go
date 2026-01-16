@@ -30,7 +30,6 @@ type Logger struct {
 }
 
 type LogPayload struct {
-	Service       string    // e.g. "r2-notify"
 	Component     string    // e.g. "eventhub-consumer"
 	Operation     string    // e.g. "ReceiveEvent"
 	Message       string    // human-readable message
@@ -182,7 +181,7 @@ func (l *Logger) Info(payload LogPayload) {
 	payload.Timestamp = time.Now()
 	if l.useAzure {
 		trace := ai.NewTraceTelemetry(payload.Message, ai.Information)
-		trace.Properties["service"] = payload.Service
+		trace.Properties["service"] = data.SERVICE_NAME
 		trace.Properties["component"] = payload.Component
 		trace.Properties["operation"] = payload.Operation
 		trace.Properties["correlationId"] = payload.CorrelationId
@@ -191,7 +190,7 @@ func (l *Logger) Info(payload LogPayload) {
 		l.aiClient.Track(trace)
 	} else {
 		l.zapLogger.Info(payload.Message,
-			zap.String("service", payload.Service),
+			zap.String("service", data.SERVICE_NAME),
 			zap.String("component", payload.Component),
 			zap.String("operation", payload.Operation),
 			zap.String("correlationId", payload.CorrelationId),
@@ -238,7 +237,7 @@ func (l *Logger) Debug(payload LogPayload) {
 	payload.Timestamp = time.Now()
 	if l.useAzure {
 		trace := ai.NewTraceTelemetry(payload.Message, ai.Verbose)
-		trace.Properties["service"] = payload.Service
+		trace.Properties["service"] = data.SERVICE_NAME
 		trace.Properties["component"] = payload.Component
 		trace.Properties["operation"] = payload.Operation
 		trace.Properties["correlationId"] = payload.CorrelationId
@@ -247,7 +246,7 @@ func (l *Logger) Debug(payload LogPayload) {
 		l.aiClient.Track(trace)
 	} else {
 		l.zapLogger.Debug(payload.Message,
-			zap.String("service", payload.Service),
+			zap.String("service", data.SERVICE_NAME),
 			zap.String("component", payload.Component),
 			zap.String("operation", payload.Operation),
 			zap.String("correlationId", payload.CorrelationId),
@@ -293,7 +292,7 @@ func (l *Logger) Warn(payload LogPayload) {
 	payload.Timestamp = time.Now()
 	if l.useAzure {
 		trace := ai.NewTraceTelemetry(payload.Message, ai.Warning)
-		trace.Properties["service"] = payload.Service
+		trace.Properties["service"] = data.SERVICE_NAME
 		trace.Properties["component"] = payload.Component
 		trace.Properties["operation"] = payload.Operation
 		trace.Properties["correlationId"] = payload.CorrelationId
@@ -302,7 +301,7 @@ func (l *Logger) Warn(payload LogPayload) {
 		l.aiClient.Track(trace)
 	} else {
 		l.zapLogger.Warn(payload.Message,
-			zap.String("service", payload.Service),
+			zap.String("service", data.SERVICE_NAME),
 			zap.String("component", payload.Component),
 			zap.String("operation", payload.Operation),
 			zap.String("correlationId", payload.CorrelationId),
@@ -350,7 +349,7 @@ func (l *Logger) Error(payload LogPayload) {
 	payload.Timestamp = time.Now()
 	if l.useAzure {
 		trace := ai.NewTraceTelemetry(payload.Message, ai.Error)
-		trace.Properties["service"] = payload.Service
+		trace.Properties["service"] = data.SERVICE_NAME
 		trace.Properties["component"] = payload.Component
 		trace.Properties["operation"] = payload.Operation
 		trace.Properties["correlationId"] = payload.CorrelationId
@@ -362,7 +361,7 @@ func (l *Logger) Error(payload LogPayload) {
 		l.aiClient.Track(trace)
 	} else {
 		fields := []zap.Field{
-			zap.String("service", payload.Service),
+			zap.String("service", data.SERVICE_NAME),
 			zap.String("component", payload.Component),
 			zap.String("operation", payload.Operation),
 			zap.String("correlationId", payload.CorrelationId),

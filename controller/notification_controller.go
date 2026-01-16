@@ -36,7 +36,6 @@ func (controller *NotificationController) CreateNotification(ctx *gin.Context) {
 	correlationId, _ := ctx.Get(data.CORRELATION_ID)
 
 	logger.Log.Debug(logger.LogPayload{
-		Service:       "r2-notify",
 		Component:     "NotificationController",
 		Operation:     "CreateNotification",
 		Message:       "CreateNotification called",
@@ -47,7 +46,6 @@ func (controller *NotificationController) CreateNotification(ctx *gin.Context) {
 
 	if userId == "" || appId == "" {
 		logger.Log.Error(logger.LogPayload{
-			Service:       "r2-notify",
 			Component:     "NotificationController",
 			Operation:     "CreateNotification",
 			Message:       "Missing X-User-ID or X-App-ID header",
@@ -62,7 +60,6 @@ func (controller *NotificationController) CreateNotification(ctx *gin.Context) {
 	var payload data.CreateNotificationRequest
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
 		logger.Log.Error(logger.LogPayload{
-			Service:       "r2-notify",
 			Component:     "NotificationController",
 			Operation:     "CreateNotification",
 			Message:       "Invalid request payload",
@@ -96,7 +93,6 @@ func (controller *NotificationController) CreateNotification(ctx *gin.Context) {
 
 	if err != nil {
 		logger.Log.Error(logger.LogPayload{
-			Service:       "r2-notify",
 			Component:     "NotificationController",
 			Operation:     "CreateNotification",
 			Message:       "Failed to create notification",
@@ -110,7 +106,6 @@ func (controller *NotificationController) CreateNotification(ctx *gin.Context) {
 	}
 
 	logger.Log.Debug(logger.LogPayload{
-		Service:       "r2-notify",
 		Component:     "NotificationController",
 		Operation:     "CreateNotification",
 		Message:       fmt.Sprintf("Notification created with payload %v", m),
@@ -120,7 +115,6 @@ func (controller *NotificationController) CreateNotification(ctx *gin.Context) {
 	})
 
 	logger.Log.Debug(logger.LogPayload{
-		Service:       "r2-notify",
 		Component:     "NotificationController",
 		Operation:     "CreateNotification",
 		Message:       "Sending notification to user",

@@ -30,7 +30,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func main() {
+func Main() {
 	// Only load .env file in local development
 	if os.Getenv("ENV") != data.PRODUCTION_ENV {
 		err := godotenv.Load()
@@ -60,8 +60,7 @@ func main() {
 	notificationService, err := notificationService.NewNotificationServiceImpl(notificationRepository, validate)
 	if err != nil {
 		logger.Log.Error(logger.LogPayload{
-			Service:   "r2-notify",
-			Component: "main",
+			Component: "Main",
 			Operation: "NotificationService",
 			Message:   "Failed to initialize notification service",
 			Error:     err,
@@ -72,8 +71,7 @@ func main() {
 	configurationService, err := configurationService.NewConfigurationServiceImpl(configurationRepository, validate)
 	if err != nil {
 		logger.Log.Error(logger.LogPayload{
-			Service:   "r2-notify",
-			Component: "main",
+			Component: "Main",
 			Operation: "ConfigurationService",
 			Message:   "Failed to initialize configuration service",
 			Error:     err,
@@ -87,8 +85,7 @@ func main() {
 	go func() {
 		if err := consumer.StartEventHubConsumer(ctx, notificationService); err != nil {
 			logger.Log.Error(logger.LogPayload{
-				Service:   "r2-notify",
-				Component: "main",
+				Component: "Main",
 				Operation: "EventHubConsumer",
 				Message:   "Failed to start Event Hub consumer",
 				Error:     err,
@@ -111,8 +108,8 @@ func main() {
 	// Enable CORS for all origins
 	corsHandler := cors.New(cors.Options{
 		AllowedOrigins:   utils.ProcessAllowedOrigins(config.LoadConfig().AllowedOrigins),
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"Content-Type", "Authorization", "X-User-ID"},
+		AllowedMethods:   []string{"POST", "OPTIONS"},
+		AllowedHeaders:   []string{"Content-Type", "X-User-ID", "X-Correlation-ID", "X-App-ID"},
 		AllowCredentials: true,
 	}).Handler(r)
 
@@ -126,8 +123,7 @@ func main() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("listen: %s\n", err)
 			logger.Log.Error(logger.LogPayload{
-				Service:   "r2-notify",
-				Component: "main",
+				Component: "Main",
 				Operation: "ListenAndServe",
 				Message:   "Failed to start server",
 				Error:     err,
@@ -137,8 +133,7 @@ func main() {
 	}()
 
 	logger.Log.Info(logger.LogPayload{
-		Service:   "r2-notify",
-		Component: "main",
+		Component: "Main",
 		Operation: "Startup",
 		Message:   fmt.Sprintf("Server started on port %s", config.LoadConfig().Port),
 	})
@@ -147,8 +142,7 @@ func main() {
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	<-c
 	logger.Log.Info(logger.LogPayload{
-		Service:   "r2-notify",
-		Component: "main",
+		Component: "Main",
 		Operation: "Startup",
 		Message:   "Received shutdown signal",
 	})
@@ -159,8 +153,7 @@ func main() {
 	defer cancelShutdown()
 	if err := srv.Shutdown(ctxShutdown); err != nil {
 		logger.Log.Error(logger.LogPayload{
-			Service:   "r2-notify",
-			Component: "main",
+			Component: "Main",
 			Operation: "Startup",
 			Message:   "Received shutdown signal",
 			Error:     err,
@@ -168,8 +161,7 @@ func main() {
 		os.Exit(1)
 	}
 	logger.Log.Info(logger.LogPayload{
-		Service:   "r2-notify",
-		Component: "main",
+		Component: "Main",
 		Operation: "Exit",
 		Message:   "Server exited properly",
 	})
