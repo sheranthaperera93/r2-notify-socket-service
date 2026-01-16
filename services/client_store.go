@@ -213,7 +213,7 @@ func UpdateClientInfo(info models.ClientInfo) error {
 // data.ActionNotification struct. It does not bypass the notification check, meaning the user's
 // notification status will be checked before sending the notification. If the user has disabled
 // notifications, the function will return an error.
-func SendNotificationToUser(payload data.ActionNotification) error {
+func SendNotificationToUser(payload data.EventNotification) error {
 	return sendToUser(payload.UserID, payload, false)
 }
 

@@ -123,8 +123,8 @@ func (controller *NotificationController) CreateNotification(ctx *gin.Context) {
 		CorrelationId: correlationId.(string),
 	})
 
-	clientStore.SendNotificationToUser(data.ActionNotification{
-		Action: data.Action{Action: "newNotification"},
+	clientStore.SendNotificationToUser(data.EventNotification{
+		Event: data.Event{Event: "newNotification"},
 		Notification: data.Notification{
 			Id:        recordId.Hex(),
 			UserID:    m.UserId,

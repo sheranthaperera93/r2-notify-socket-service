@@ -5,7 +5,7 @@ const SERVICE_NAME = "r2-notify-server"
 const PRODUCTION_ENV = "production"
 const DEFAULT_ORIGINS = "http://127.0.0.1:4200,http://localhost:4200"
 
-// WebSocket action types
+// WebSocket event types
 const (
 	NEW_NOTIFICATION    = "newNotification"
 	LIST_NOTIFICATIONS  = "listNotifications"
@@ -14,19 +14,19 @@ const (
 
 // Notification event types
 const (
-	// Mark as Read Actions
+	// Mark as Read events
 	MARK_AS_READ              = "markAsRead"
 	MARK_APP_AS_READ          = "markAppAsRead"
 	MARK_GROUP_AS_READ        = "markGroupAsRead"
 	MARK_NOTIFICATION_AS_READ = "markNotificationAsRead"
 
-	// Delete Actions
+	// Delete events
 	DELETE_NOTIFICATIONS       = "deleteNotifications"
 	DELETE_APP_NOTIFICATIONS   = "deleteAppNotifications"
 	DELETE_GROUP_NOTIFICATIONS = "deleteGroupNotifications"
 	DELETE_NOTIFICATION        = "deleteNotification"
 
-	// Other Actions
+	// Other events
 	RELOAD_NOTIFICATIONS       = "reloadNotifications"
 	TOGGLE_NOTIFICATION_STATUS = "toggleNotificationStatus"
 )

@@ -30,7 +30,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func Main() {
+func main() {
 	// Only load .env file in local development
 	if os.Getenv("ENV") != data.PRODUCTION_ENV {
 		err := godotenv.Load()

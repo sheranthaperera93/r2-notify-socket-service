@@ -29,22 +29,22 @@ type NotificationStatusUpdate struct {
 	Status string `json:"status"`
 }
 
-type Action struct {
-	Action string `json:"action"`
+type Event struct {
+	Event string `json:"event"`
 }
 
-type ActionNotification struct {
-	Action
+type EventNotification struct {
+	Event
 	Notification
 }
 
 type NotificationList struct {
-	Action
+	Event
 	Data []Notification `json:"data"`
 }
 
 type Configuration struct {
-	Action
+	Event
 	Id                 string `json:"id"`
 	UserID             string `json:"userId"`
 	EnableNotification bool   `json:"enableNotification"`
