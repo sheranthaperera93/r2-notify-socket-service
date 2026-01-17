@@ -143,7 +143,7 @@ func NewWebSocketHandler(notificationService notificationService.NotificationSer
 				return
 			}
 		} else {
-			isEnableNotification = configuration.EnableNotification
+			isEnableNotification = configuration.Data.EnableNotification
 		}
 
 		info := models.ClientInfo{
@@ -301,10 +301,12 @@ func sendAllNotificationsToClient(notificationService notificationService.Notifi
 func sendConfigurationsToClient(configurationService configurationService.ConfigurationService, clientId string, correlationId string) {
 	configuration, err := configurationService.FindByAppAndUser(clientId)
 	payload := data.Configuration{
-		Event:              data.Event{Event: data.LIST_CONFIGURATIONS},
-		UserID:             clientId,
-		EnableNotification: configuration.EnableNotification,
-		Id:                 configuration.Id,
+		Event: data.Event{Event: data.LIST_CONFIGURATIONS},
+		Data: data.NotificationConfig{
+			UserID:             clientId,
+			EnableNotification: configuration.Data.EnableNotification,
+			Id:                 configuration.Data.Id,
+		},
 	}
 	if err != nil {
 		logger.Log.Error(logger.LogPayload{
@@ -645,7 +647,7 @@ func toggleNotificationStatusAction(message []byte, configurationService configu
 	}
 	err := configurationService.Update(models.Configuration{
 		UserId:              clientID,
-		EnableNotifications: event.EnableNotification,
+		EnableNotifications: event.Data.EnableNotification,
 	})
 	if err != nil {
 		logger.Log.Error(logger.LogPayload{
@@ -660,15 +662,15 @@ func toggleNotificationStatusAction(message []byte, configurationService configu
 	logger.Log.Info(logger.LogPayload{
 		Component:     "WebSocket Toggle Notification Status Event",
 		Operation:     "UpdateConfiguration",
-		Message:       "Updated configuration for client: " + clientID + ", EnableNotification: " + fmt.Sprintf("%v", event.EnableNotification),
+		Message:       "Updated configuration for client: " + clientID + ", EnableNotification: " + fmt.Sprintf("%v", event.Data.EnableNotification),
 		UserId:        clientID,
 		CorrelationId: correlationId,
 	})
 	clientStore.UpdateClientInfo(models.ClientInfo{
 		ID:                 clientID,
-		EnableNotification: event.EnableNotification,
+		EnableNotification: event.Data.EnableNotification,
 	})
-	if event.EnableNotification {
+	if event.Data.EnableNotification {
 		logger.Log.Debug(logger.LogPayload{
 			Component:     "WebSocket Toggle Notification Status Event",
 			Operation:     "SendNotifications",

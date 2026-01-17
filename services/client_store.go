@@ -222,7 +222,7 @@ func SendNotificationToUser(payload data.EventNotification) error {
 // check the user's notification status before sending the configuration. Otherwise, it will check
 // the user's notification status and return an error if notifications are disabled.
 func SendConfigurationToUser(payload data.Configuration, bypassNotificationCheck bool) error {
-	return sendToUser(payload.UserID, payload, bypassNotificationCheck)
+	return sendToUser(payload.Data.UserID, payload, bypassNotificationCheck)
 }
 
 // SendNotificationListToUser sends a list of notifications to a user identified by the given userID.

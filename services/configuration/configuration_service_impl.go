@@ -54,9 +54,12 @@ func (t ConfigurationServiceImpl) FindByAppAndUser(userId string) (data.Configur
 	}
 
 	configuration := data.Configuration{
-		Id:                 result.Id.Hex(),
-		UserID:             result.UserId,
-		EnableNotification: result.EnableNotifications,
+		Event: data.Event{Event: data.LIST_CONFIGURATIONS},
+		Data: data.NotificationConfig{
+			Id:                 result.Id.Hex(),
+			UserID:             result.UserId,
+			EnableNotification: result.EnableNotifications,
+		},
 	}
 	logger.Log.Info(logger.LogPayload{
 		Component: "Configuration Service",

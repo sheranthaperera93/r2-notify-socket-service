@@ -43,11 +43,15 @@ type NotificationList struct {
 	Data []Notification `json:"data"`
 }
 
-type Configuration struct {
-	Event
+type NotificationConfig struct {
 	Id                 string `json:"id"`
 	UserID             string `json:"userId"`
 	EnableNotification bool   `json:"enableNotification"`
+}
+
+type Configuration struct {
+	Event
+	Data NotificationConfig `json:"data"`
 }
 
 type CreateNotificationRequest struct {
