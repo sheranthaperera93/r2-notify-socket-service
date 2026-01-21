@@ -106,7 +106,7 @@ func StartEventHubConsumer(ctx context.Context, notificationService notification
 					},
 				}
 				m.Id = recordId
-				clientStore.SendNotificationToUser(payload)
+				clientStore.SendNotificationToUser(payload, false)
 
 				logger.Log.Info(logger.LogPayload{
 					Message:       fmt.Sprintf("Sending notification to user %v", m),

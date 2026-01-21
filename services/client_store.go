@@ -212,12 +212,13 @@ func UpdateClientInfo(info models.ClientInfo) error {
 // SendNotificationToUser sends a notification to a user identified by the UserID field in the given
 // data.ActionNotification struct. It does not bypass the notification check, meaning the user's
 // notification status will be checked before sending the notification. If the user has disabled
+// If bypassStatusCheck is true, it will skip the notification status check.
 // notifications, the function will return an error.
-func SendNotificationToUser(payload data.EventNotification) error {
-	return sendToUser(payload.Data.UserID, payload, false)
+func SendNotificationToUser(payload data.EventNotification, bypassStatusCheck bool) error {
+	return sendToUser(payload.Data.UserID, payload, bypassStatusCheck)
 }
 
-// SendConfigurationToUser sends the user configuration to the user identified by the UserID field
+// SendConfigurationToUser sends the user configuration to the user identified by the UserIdD field
 // in the given data.Configuration struct. If bypassNotificationCheck is true, the function will not
 // check the user's notification status before sending the configuration. Otherwise, it will check
 // the user's notification status and return an error if notifications are disabled.
@@ -228,9 +229,10 @@ func SendConfigurationToUser(payload data.Configuration, bypassNotificationCheck
 // SendNotificationListToUser sends a list of notifications to a user identified by the given userID.
 // It uses the NotificationList struct to encapsulate the notifications data.
 // The function will check the user's notification status before sending.
+// If bypassStatusCheck is true, it will skip the notification status check.
 // Returns an error if the user is not connected or if notifications are disabled.
-func SendNotificationListToUser(userID string, notifications data.NotificationList) error {
-	return sendToUser(userID, notifications, false)
+func SendNotificationListToUser(userID string, notifications data.NotificationList, bypassStatusCheck bool) error {
+	return sendToUser(userID, notifications, bypassStatusCheck)
 }
 
 // getConnAndInfo retrieves the websocket connections and the client information for the given user ID.

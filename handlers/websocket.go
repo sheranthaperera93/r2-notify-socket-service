@@ -3,11 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
-	"slices"
-	"time"
-
 	"r2-notify-server/config"
 	"r2-notify-server/data"
 	"r2-notify-server/logger"
@@ -16,6 +12,8 @@ import (
 	configurationService "r2-notify-server/services/configuration"
 	notificationService "r2-notify-server/services/notification"
 	"r2-notify-server/utils"
+	"slices"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -78,13 +76,16 @@ func NewWebSocketHandler(notificationService notificationService.NotificationSer
 		// Start pinging client every 30 seconds
 		go func() {
 			ticker := time.NewTicker(30 * time.Second)
-			defer func() {
-				ticker.Stop()
-				conn.Close()
-			}()
+			defer ticker.Stop()
 			for {
+				<-ticker.C
+				logger.Log.Debug(logger.LogPayload{
+					Component: "WebSocket Ping Handler",
+					Operation: "SetPongHandler",
+					Message:   "Ping sent to client " + clientID,
+					UserId:    clientID,
+				})
 				if err := conn.WriteMessage(websocket.PingMessage, nil); err != nil {
-					log.Printf("Ping failed for client %s: %v\n", clientID, err.Error())
 					logger.Log.Error(logger.LogPayload{
 						Component: "WebSocket Pong Handler",
 						Operation: "PingHandler",
@@ -95,13 +96,6 @@ func NewWebSocketHandler(notificationService notificationService.NotificationSer
 					clientStore.RemoveConnection(clientID, conn)
 					return
 				}
-				logger.Log.Debug(logger.LogPayload{
-					Component: "WebSocket Ping Handler",
-					Operation: "SetPongHandler",
-					Message:   "Ping sent to client " + clientID,
-					UserId:    clientID,
-				})
-				<-ticker.C
 			}
 		}()
 
@@ -174,7 +168,7 @@ func NewWebSocketHandler(notificationService notificationService.NotificationSer
 		})
 
 		// Fetch and send all notifications for the client
-		sendAllNotificationsToClient(notificationService, clientID, correlationId)
+		sendAllNotificationsToClient(notificationService, clientID, correlationId, false)
 
 		// Send Client Configurations
 		sendConfigurationsToClient(configurationService, clientID, correlationId)
@@ -183,7 +177,7 @@ func NewWebSocketHandler(notificationService notificationService.NotificationSer
 		go func() {
 			defer conn.Close()
 			for {
-				_, message, err := conn.ReadMessage()
+				messageType, message, err := conn.ReadMessage()
 				if err != nil {
 					logger.Log.Info(logger.LogPayload{
 						Component:     "WebSocket Websocket Store",
@@ -194,6 +188,16 @@ func NewWebSocketHandler(notificationService notificationService.NotificationSer
 					})
 					clientStore.RemoveConnection(clientID, conn)
 					break
+				}
+
+				// Skip control messages (ping, pong, close)
+				if messageType != websocket.TextMessage && messageType != websocket.BinaryMessage {
+					continue
+				}
+
+				// Skip empty messages
+				if len(message) == 0 {
+					continue
 				}
 
 				// Parse events
@@ -242,10 +246,11 @@ func NewWebSocketHandler(notificationService notificationService.NotificationSer
 
 				// Other Events
 				case data.RELOAD_NOTIFICATIONS:
-					sendAllNotificationsToClient(notificationService, clientID, correlationId)
+					sendAllNotificationsToClient(notificationService, clientID, correlationId, false)
 				case data.SET_NOTIFICATION_STATUS:
 					setNotificationStatusAction(message, configurationService, notificationService, clientID, correlationId)
 				default:
+					fmt.Printf("Unknown event -----------------> %+v\n", event)
 					logger.Log.Warn(logger.LogPayload{
 						Component:     "WebSocket Event Handler",
 						Operation:     "HandleEvent",
@@ -264,7 +269,8 @@ func NewWebSocketHandler(notificationService notificationService.NotificationSer
 // encapsulating the notifications. If the fetch operation fails, it logs an error and does not send the notifications. If the fetch
 // operation is successful, it sends the constructed payload to the client using the clientStore. If the send operation fails, it logs
 // an error.
-func sendAllNotificationsToClient(notificationService notificationService.NotificationService, clientId string, correlationId string) {
+// If bypassStatusCheck is true, it will skip the notification status check when sending notifications.
+func sendAllNotificationsToClient(notificationService notificationService.NotificationService, clientId string, correlationId string, bypassStatusCheck bool) {
 	notifications, err := notificationService.FindAll(clientId)
 	payload := data.NotificationList{
 		Event: data.Event{Event: data.LIST_NOTIFICATIONS},
@@ -285,7 +291,7 @@ func sendAllNotificationsToClient(notificationService notificationService.Notifi
 			Message:       "Sending all notifications to client: " + clientId,
 			CorrelationId: correlationId,
 		})
-		if err := clientStore.SendNotificationListToUser(clientId, payload); err != nil {
+		if err := clientStore.SendNotificationListToUser(clientId, payload, bypassStatusCheck); err != nil {
 			logger.Log.Error(logger.LogPayload{
 				Component:     "WebSocket Notification Handler",
 				Operation:     "SendNotifications",
@@ -302,12 +308,12 @@ func sendAllNotificationsToClient(notificationService notificationService.Notifi
 // encapsulating the notifications. If the fetch operation fails, it logs an error and does not send the notifications. If the fetch
 // operation is successful, it sends the constructed payload to the client using the clientStore. If the send operation fails, it logs
 // an error.
-func sendEmptyNotificationListToClient(clientId string, correlationId string) {
+func sendEmptyNotificationListToClient(clientId string, correlationId string, bypassNotificationStatus bool) {
 	payload := data.NotificationList{
 		Event: data.Event{Event: data.LIST_NOTIFICATIONS},
 		Data:  []data.Notification{},
 	}
-	if err := clientStore.SendNotificationListToUser(clientId, payload); err != nil {
+	if err := clientStore.SendNotificationListToUser(clientId, payload, bypassNotificationStatus); err != nil {
 		logger.Log.Error(logger.LogPayload{
 			Component:     "WebSocket Notification Handler",
 			Operation:     "SendNotifications",
@@ -384,7 +390,7 @@ func markAsReadAction(notificationService notificationService.NotificationServic
 			Error:         err,
 		})
 	}
-	sendAllNotificationsToClient(notificationService, clientID, correlationId)
+	sendAllNotificationsToClient(notificationService, clientID, correlationId, false)
 }
 
 // markAppReadAction handles the event to mark all notifications for a specific app as read for a given client.
@@ -423,7 +429,7 @@ func markAppReadAction(message []byte, notificationService notificationService.N
 			Error:         err,
 		})
 	}
-	sendAllNotificationsToClient(notificationService, clientID, correlationId)
+	sendAllNotificationsToClient(notificationService, clientID, correlationId, false)
 }
 
 // markGroupAsReadAction handles the event to mark all notifications with a given appId and groupKey as read for a given client.
@@ -464,7 +470,7 @@ func markGroupAsReadAction(message []byte, notificationService notificationServi
 			Error:         err,
 		})
 	}
-	sendAllNotificationsToClient(notificationService, clientID, correlationId)
+	sendAllNotificationsToClient(notificationService, clientID, correlationId, false)
 }
 
 // markNotificationAsReadAction handles the event to mark a specific notification as read for a given client.
@@ -502,7 +508,7 @@ func markNotificationAsReadAction(message []byte, notificationService notificati
 			Error:         err,
 		})
 	}
-	sendAllNotificationsToClient(notificationService, clientID, correlationId)
+	sendAllNotificationsToClient(notificationService, clientID, correlationId, false)
 }
 
 // deleteNotificationsAction handles the event to delete all notifications for a given client.
@@ -528,7 +534,7 @@ func deleteNotificationsAction(notificationService notificationService.Notificat
 			Error:         err,
 		})
 	}
-	sendAllNotificationsToClient(notificationService, clientID, correlationId)
+	sendAllNotificationsToClient(notificationService, clientID, correlationId, false)
 }
 
 // deleteAppNotificationsAction handles the event to delete all notifications for a specific app for a given client.
@@ -569,7 +575,7 @@ func deleteAppNotificationsAction(message []byte, notificationService notificati
 			Error:         err,
 		})
 	}
-	sendAllNotificationsToClient(notificationService, clientID, correlationId)
+	sendAllNotificationsToClient(notificationService, clientID, correlationId, false)
 }
 
 // deleteGroupNotificationAction handles the event to delete all notifications with a given appId and groupKey for a given client.
@@ -610,7 +616,7 @@ func deleteGroupNotificationAction(message []byte, notificationService notificat
 			Error:         err,
 		})
 	}
-	sendAllNotificationsToClient(notificationService, clientID, correlationId)
+	sendAllNotificationsToClient(notificationService, clientID, correlationId, false)
 }
 
 // deleteNotificationAction handles the event to delete a specific notification for a given client.
@@ -648,7 +654,7 @@ func deleteNotificationAction(message []byte, notificationService notificationSe
 			Error:         err,
 		})
 	}
-	sendAllNotificationsToClient(notificationService, clientID, correlationId)
+	sendAllNotificationsToClient(notificationService, clientID, correlationId, false)
 }
 
 // setNotificationStatusAction handles the toggle notification status event.
@@ -702,10 +708,17 @@ func setNotificationStatusAction(message []byte, configurationService configurat
 			UserId:        clientID,
 			CorrelationId: correlationId,
 		})
-		sendAllNotificationsToClient(notificationService, clientID, correlationId)
+		sendAllNotificationsToClient(notificationService, clientID, correlationId, false)
 	} else {
 		// Send empty notification list to client
-		sendEmptyNotificationListToClient(clientID, correlationId)
+		logger.Log.Debug(logger.LogPayload{
+			Component:     "WebSocket Toggle Notification Status Event",
+			Operation:     "SendNotifications",
+			Message:       "Sending empty list to client: " + clientID,
+			UserId:        clientID,
+			CorrelationId: correlationId,
+		})
+		sendEmptyNotificationListToClient(clientID, correlationId, true)
 	}
 	// Send updated configuration to client
 	sendConfigurationsToClient(configurationService, clientID, correlationId)

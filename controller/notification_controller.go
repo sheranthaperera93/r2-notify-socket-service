@@ -135,6 +135,6 @@ func (controller *NotificationController) CreateNotification(ctx *gin.Context) {
 			CreatedAt: m.CreatedAt,
 			UpdatedAt: m.UpdatedAt,
 		},
-	})
+	}, false)
 	ctx.JSON(http.StatusCreated, m)
 }
